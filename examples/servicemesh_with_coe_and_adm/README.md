@@ -279,10 +279,6 @@ Create a Kubernetes secret `nslogin` with the login credentials of Citrix ADC VP
    
       helm install citrix-adc-istio-ingress-gateway citrix/citrix-adc-istio-ingress-gateway --namespace citrix-system --set ingressGateway.EULA=YES --set citrixCPX=true  --set ADMSettings.ADMIP=X.X.X.X  --set coe.coeURL=coe.citrix-system --set ingressGateway.secretVolumes[0].name=httpbin-ingressgateway-certs,ingressGateway.secretVolumes[0].secretName=httpbin-ingressgateway-certs,ingressGateway.secretVolumes[0].mountPath=/etc/istio/httpbin-ingressgateway-certs  --set ingressGateway.tcpPort[0].name=tcp1,ingressGateway.tcpPort[0].nodePort=30900,ingressGateway.tcpPort[0].port=9090,ingressGateway.tcpPort[0].targetPort=9090 --set ingressGateway.tcpPort[1].name=tcp2,ingressGateway.tcpPort[1].nodePort=30300,ingressGateway.tcpPort[1].port=3000,ingressGateway.tcpPort[1].targetPort=3000>
 
-**Note:** If Citrix ADC CPX is deployed as Ingress Gateway and `adm-agent-onboarding` job is deployed in other namespace than `citrix-system`, then label the namespace `citrix-system` with `citrix-cpx=enabled`.
-
-      kubectl label namespace citrix-system citrix-cpx=enabled
-
 #### Deploying Citrix ADC CPX
 
      helm install cpx-sidecar-injector citrix-cpx-istio-sidecar-injector --namespace citrix-system --set cpxProxy.EULA=YES --set xDSAdaptor.image=quay.io/ajeetas/xds-adaptor:0.9.8.latest  --set coe.coeURL=coe.citrix-system  --set ADMSettings.ADMIP=X.X.X.X
