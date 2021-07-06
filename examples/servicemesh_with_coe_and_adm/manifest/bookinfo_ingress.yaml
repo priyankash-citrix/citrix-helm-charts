@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-vpx
+  annotations:
+   kubernetes.io/ingress.class: "vpx"
+   ingress.citrix.com/frontend-ip: "<VPX-VIP>"
+spec:
+#  tls:
+#  - secretName: bookinfo
+  rules:
+  - host:  www.bookinfo.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: citrix-adc-istio-ingress-gateway-citrix-ingress-svc
+          servicePort: 80
