@@ -1,11 +1,35 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: httpbin-secure-gateway
+  name: cpx-httpbin-gateway
 spec:
   selector:
     app: cpx_ingressgateway
-    app: citrix-ingressgateway 
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/httpbin-ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/httpbin-ingressgateway-certs/tls.key
+    hosts:
+    - "www.httpbin.com"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "www.httpbin.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: httpbin-gateway
+spec:
+  selector:
+    app: citrix-ingressgateway
   servers:
   - port:
       number: 443
@@ -33,7 +57,7 @@ spec:
   - "www.httpbin.com"
   gateways:
   - httpbin-gateway
-  - httpbin-secure-gateway 
+  - cpx-httpbin-gateway
   http:
   - route:
     - destination:

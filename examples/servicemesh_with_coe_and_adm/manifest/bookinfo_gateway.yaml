@@ -2,10 +2,9 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: bookinfo-https-gateway
+  name: cpx-bookinfo-gateway
 spec:
   selector:
-    app: citrix-ingressgateway
     app: cpx_ingressgateway
   servers:
   - port:
@@ -18,31 +17,21 @@ spec:
       privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
     - "www.bookinfo.com"
----
-# Source: bookinfo-citrix-ingress/templates/bookinfo_http_gateway.yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: bookinfo-http-gateway
-spec:
-  selector:
-      app: cpx_ingressgateway
-    app: citrix-ingressgateway
-  servers:
   - port:
       number: 80
       name: http
       protocol: HTTP
     hosts:
     - "www.bookinfo.com"
----apiVersion: networking.istio.io/v1alpha3
+---
+# Source: bookinfo-citrix-ingress/templates/bookinfo_https_gateway.yaml
+apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: httpbin-secure-gateway
+  name: bookinfo-gateway
 spec:
   selector:
-    app: cpx_ingressgateway
-    app: citrix-ingressgateway 
+    app: citrix-ingressgateway
   servers:
   - port:
       number: 443
@@ -50,31 +39,34 @@ spec:
       protocol: HTTPS
     tls:
       mode: SIMPLE
-      serverCertificate: /etc/istio/httpbin-ingressgateway-certs/tls.crt
-      privateKey: /etc/istio/httpbin-ingressgateway-certs/tls.key
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
     hosts:
-    - "www.httpbin.com"
+    - "www.bookinfo.com"
   - port:
       number: 80
       name: http
       protocol: HTTP
     hosts:
-    - "www.httpbin.com"
+    - "www.bookinfo.com"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: httpbin
+  name: productpage
 spec:
   hosts:
-  - "www.httpbin.com"
+  - "www.bookinfo.com"
   gateways:
-  - httpbin-gateway
-  - httpbin-secure-gateway 
+  - cpx-bookinfo-gateway
+  - bookinfo-gateway
   http:
-  - route:
+  - match:
+    - uri:
+        exact: /productpage
+    - uri:
+        prefix: /
+    route:
     - destination:
-        host: httpbin
-        port:
-          number: 8000
+        host: productpage
 ---
