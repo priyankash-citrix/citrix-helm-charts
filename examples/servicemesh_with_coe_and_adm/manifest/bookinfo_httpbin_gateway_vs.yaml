@@ -1,0 +1,80 @@
+# Source: bookinfo-citrix-ingress/templates/bookinfo_https_gateway.yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-https-gateway
+spec:
+  selector:
+    app: citrix-ingressgateway
+    app: cpx_ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+    hosts:
+    - "www.bookinfo.com"
+---
+# Source: bookinfo-citrix-ingress/templates/bookinfo_http_gateway.yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-http-gateway
+spec:
+  selector:
+      app: cpx_ingressgateway
+    app: citrix-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "www.bookinfo.com"
+---apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: httpbin-secure-gateway
+spec:
+  selector:
+    app: cpx_ingressgateway
+    app: citrix-ingressgateway 
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/httpbin-ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/httpbin-ingressgateway-certs/tls.key
+    hosts:
+    - "www.httpbin.com"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "www.httpbin.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+  - "www.httpbin.com"
+  gateways:
+  - httpbin-gateway
+  - httpbin-secure-gateway 
+  http:
+  - route:
+    - destination:
+        host: httpbin
+        port:
+          number: 8000
+---
